@@ -1,0 +1,35 @@
+{
+  "log_level": "info",
+  "log_file": "/var/log/procwatch.log",
+  "processes": [
+    {
+      "name": "web-server",
+      "command": "/usr/bin/python3",
+      "args": ["-m", "http.server", "8080"],
+      "workdir": "/srv/www",
+      "env": {
+        "PORT": "8080",
+        "ENV": "production"
+      },
+      "auto_restart": true,
+      "max_restarts": 10,
+      "health_check": {
+        "url": "http://localhost:8080/health",
+        "interval_seconds": 30,
+        "timeout_seconds": 5,
+        "retries": 3
+      }
+    },
+    {
+      "name": "worker",
+      "command": "/usr/local/bin/worker",
+      "args": ["--queue", "default"],
+      "workdir": "/srv/app",
+      "env": {
+        "REDIS_URL": "redis://localhost:6379"
+      },
+      "auto_restart": true,
+      "max_restarts": 5
+    }
+  ]
+}
